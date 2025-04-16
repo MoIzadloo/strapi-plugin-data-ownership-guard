@@ -54,8 +54,8 @@ The plugin supports both JWT and Firebase authentication. Make sure your authent
 
 ### 4. Enabling APIs
 
-<b>IMPORTANT:</b> You need to enable find and findOne APIs in user-permissions section under USER category to make the plugin able to work.</br>
-You need to enable APIs that you want to protect by this plugin.</br>
+<b>IMPORTANT:</b> You need to enable find and findOne APIs in user-permissions section under USER category to make the plugin able to work.<br />
+You need to enable APIs that you want to protect by this plugin.<br />
 note: Make sure you enable these APIs as <b>Authenticated</b> otehrwise you may receive unknow errors.
 
 ## How It Works
