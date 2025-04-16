@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "plugin_settings",
+  "info": {
+    "singularName": "plugin-setting",
+    "pluralName": "plugin-settings",
+    "displayName": "plugin-setting"
+  },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": false
+    },
+
+    "content-type-builder": {
+      "visible": false
+    }
+  },
+  "options": {
+    "comment": ""
+  },
+  "attributes": {
+    "path": {
+      "type": "string"
+    },
+    "method": {
+      "type": "string"
+    },
+    "handler": {
+      "type": "string"
+    }
+  }
+}
