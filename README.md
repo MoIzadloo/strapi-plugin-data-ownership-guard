@@ -16,7 +16,7 @@ A powerful Strapi plugin that helps protect your data by ensuring users can only
 1. Install the plugin using npm:
 
 ```bash
-npm install sstrapi-plugin-data-ownership-guard
+npm install strapi-plugin-data-ownership-guard
 ```
 
 2. Rebuild your Strapi admin panel:
