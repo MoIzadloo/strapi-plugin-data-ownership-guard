@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
   "keywords": [
     "strapi",
     "plugin",
@@ -8,7 +8,9 @@
     "data",
     "RBAC",
     "access control",
-    "data ownership"
+    "data ownership",
+    "data access",
+    "access"
   ],
   "type": "commonjs",
   "exports": {
@@ -43,10 +45,9 @@
     "@koa/router": "^13.1.0",
     "@strapi/design-system": "^2.0.0-rc.21",
     "@strapi/icons": "^2.0.0-rc.21",
-    "@types/url-join": "^5.0.0",
     "axios": "^1.8.4",
-    "react-intl": "^7.1.10",
-    "url-join": "^5.0.0"
+    "koa-body": "^6.0.1",
+    "react-intl": "^7.1.10"
   },
   "devDependencies": {
     "@strapi/sdk-plugin": "^5.3.2",
