@@ -18,10 +18,10 @@ function removeSOrES(word: string) {
 export default (config: any, { strapi }: { strapi: Core.Strapi }) => {
   //
   return async (ctx: any, next: any) => {
-    const { request } = ctx;
-    let user: any;
-
     try {
+      const { request } = ctx;
+      let user: any;
+
       const protectedAPIs = await strapi
         .query('plugin::strapi-plugin-data-ownership-guard.plugin-setting')
         .findMany();
@@ -35,7 +35,6 @@ export default (config: any, { strapi }: { strapi: Core.Strapi }) => {
 
       const uid = `api::${removeSOrES(urlPath[1])}.${removeSOrES(urlPath[1])}`;
 
-      // If the API is not protected, proceed to the next middleware
       if (
         protectedAPIs.length === 0 ||
         protectedAPIs?.filter((api: any) => api.path === path && api.method === method).length === 0
@@ -61,20 +60,19 @@ export default (config: any, { strapi }: { strapi: Core.Strapi }) => {
         user = { id: payload.id };
       }
 
-      // If there's no authenticated user, throw an unauthorized error
       if (!user?.id) {
         strapi.log.info('Unauthorized access attempt.');
 
-        ctx.forbidden('Forbidden Access');
+        ctx.forbidden('Unauthorized access attempt.');
+        await next();
+        return;
       }
 
       if (method === 'GET') {
-        // For data retrieval requests
-        if (params && params.id) {
-          // Single record request: Validate entity ownership
+        if (params && params?.id) {
           const entity = await strapi.query(uid as any).findOne({
             where: {
-              $or: [{ id: params.id }, { document_id: params.id }],
+              $or: [{ id: params?.id }, { document_id: params?.id }],
             },
             select: ['id'],
             populate: {
@@ -84,15 +82,12 @@ export default (config: any, { strapi }: { strapi: Core.Strapi }) => {
             },
           });
 
-          console.log('entity', entity);
-
           if (!entity || entity?.user?.id !== user?.id) {
-            strapi.log.info(`User ${user?.id} is forbidden to access entity ${params.id}`);
+            strapi.log.info(`User ${user?.id} is forbidden to access entity ${params?.id}`);
 
             ctx.forbidden('Forbidden Access');
           }
         } else {
-          // For collection queries, update the query to filter for the current user
           const url = ctx.request.url;
           const queryString = url.includes('?') ? url.split('?')[1] : '';
           const originalQuery = qs.parse(queryString);
@@ -103,15 +98,12 @@ export default (config: any, { strapi }: { strapi: Core.Strapi }) => {
             delete originalQuery.filters?.user;
           }
 
-          // Add a filter to restrict results to the current user
           originalQuery.filters = {
             // @ts-ignore
             ...originalQuery.filters,
             user: { id: { $eq: user?.id } },
           };
 
-          // Rebuild and update the query string. Note that updating the URL might not affect
-          // some internal parsing, so you might also consider modifying ctx.query if needed.
           const sanitizedQuery = qs.stringify(originalQuery, {
             addQueryPrefix: true,
             encode: false,
@@ -120,16 +112,14 @@ export default (config: any, { strapi }: { strapi: Core.Strapi }) => {
           ctx.request.url = url.split('?')[0] + sanitizedQuery;
         }
       } else if (method === 'POST') {
-        // For creating new records, ensure the data is associated with the current user
         request.body.data = {
           ...request.body.data,
           user: user?.id,
         };
       } else if (method === 'PUT' || method === 'DELETE') {
-        // For updating or deleting, first confirm that the user owns the entity
         const entity = await strapi.db.query(uid).findOne({
           where: {
-            id: params.id,
+            $or: [{ id: params?.id }, { document_id: params?.id }],
           },
           select: ['id'],
           populate: {
@@ -143,13 +133,14 @@ export default (config: any, { strapi }: { strapi: Core.Strapi }) => {
           strapi.log.info(`User ${user?.id} is forbidden to modify entity ${params.id}`);
 
           ctx.forbidden('Forbidden Access');
+          return;
         }
       }
 
       // If all checks pass, proceed to the next middleware or controller.
       await next();
     } catch (error) {
-      strapi.log.error(`Error in isOwner middleware: ${error.message}`);
+      console.log('Error in strapi-plugin-data-ownership-guard :', error);
       ctx.throw(500, 'Internal Server Error');
     }
   };

@@ -1,5 +1,3 @@
-/// <reference types="url-join" />
-
 import type { Core } from '@strapi/strapi';
 import _ from 'lodash';
 
@@ -31,14 +29,14 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
         return;
       }
 
-      const apiPrefix = strapi?.config.get('api.rest.prefix');
+      const apiPrefix: string = strapi?.config.get('api.rest.prefix');
 
-      const { default: urlJoin } = await import('url-join');
+      const base = apiPrefix.endsWith('/') ? apiPrefix : `${apiPrefix}/`;
 
       routes.forEach((route: any) => {
         routesMap?.push({
           ...route,
-          path: urlJoin(apiPrefix as string, route?.path),
+          path: base?.slice(0, -1) + route.path,
         });
       });
     });
