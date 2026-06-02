@@ -140,8 +140,8 @@ export default (config: any, { strapi }: { strapi: Core.Strapi }) => {
       // If all checks pass, proceed to the next middleware or controller.
       await next();
     } catch (error) {
-      console.log('Error in strapi-plugin-data-ownership-guard :', error);
-      ctx.throw(500, 'Internal Server Error');
+      strapi.log.error('Error in strapi-plugin-data-ownership-guard:', error);
+      throw error;
     }
   };
 };
