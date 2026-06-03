@@ -8,13 +8,16 @@ import qs from 'qs';
 const PUBLIC_ROUTE_PREFIXES = ['/api/auth', '/api/connect', '/admin'];
 
 function removeSOrES(word: string) {
-  if (word?.endsWith('es')) {
-    return word?.slice(0, -2);
-  } else if (word?.endsWith('s')) {
-    return word?.slice(0, -1);
-  } else {
-    return word;
+  if (word?.endsWith('ies')) {
+    return word.slice(0, -3) + 'y';
   }
+  if (word?.endsWith('es')) {
+    return word.slice(0, -2);
+  }
+  if (word?.endsWith('s')) {
+    return word.slice(0, -1);
+  }
+  return word;
 }
 
 export default (config: any, { strapi }: { strapi: Core.Strapi }) => {
