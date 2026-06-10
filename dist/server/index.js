@@ -2338,6 +2338,16 @@ const isOwner = (config2, { strapi }) => {
       return;
     }
     const token = ctx?.request?.headers?.authorization?.split(" ")[1];
+    if (token) {
+      const apiTokenService = strapi.admin.services["api-token"];
+      const apiToken = await apiTokenService.getBy({
+        accessKey: apiTokenService.hash(token)
+      });
+      if (apiToken) {
+        await next();
+        return;
+      }
+    }
     if (strapi?.firebase !== void 0) {
       const firebaseResponse = await strapi?.firebase.auth().verifyIdToken(token);
       user = await strapi.query("plugin::users-permissions.user").findOne({
@@ -2345,8 +2355,13 @@ const isOwner = (config2, { strapi }) => {
         select: ["id"]
       });
     } else {
-      const payload = await strapi?.plugins?.["users-permissions"]?.services?.jwt?.verify(token);
-      user = { id: payload?.id };
+      try {
+        const payload = await strapi?.plugins?.["users-permissions"]?.services?.jwt?.verify(token);
+        user = { id: payload?.id };
+      } catch {
+        strapi.log.info("Unauthorized access attempt (invalid JWT).");
+        return ctx.forbidden("Unauthorized access attempt.");
+      }
     }
     if (!user?.id) {
       strapi.log.info("Unauthorized access attempt.");
