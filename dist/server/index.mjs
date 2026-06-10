@@ -2302,13 +2302,16 @@ var lib = {
 const qs = /* @__PURE__ */ getDefaultExportFromCjs(lib);
 const PUBLIC_ROUTE_PREFIXES = ["/api/auth", "/api/connect", "/admin"];
 function removeSOrES(word) {
-  if (word?.endsWith("es")) {
-    return word?.slice(0, -2);
-  } else if (word?.endsWith("s")) {
-    return word?.slice(0, -1);
-  } else {
-    return word;
+  if (word?.endsWith("ies")) {
+    return word.slice(0, -3) + "y";
   }
+  if (word?.endsWith("es")) {
+    return word.slice(0, -2);
+  }
+  if (word?.endsWith("s")) {
+    return word.slice(0, -1);
+  }
+  return word;
 }
 const isOwner = (config2, { strapi }) => {
   return async (ctx, next) => {
