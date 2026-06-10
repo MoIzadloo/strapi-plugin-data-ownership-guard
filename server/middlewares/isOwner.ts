@@ -60,6 +60,18 @@ export default (config: any, { strapi }: { strapi: Core.Strapi }) => {
 
     const token = ctx?.request?.headers?.authorization?.split(' ')[1];
 
+    if (token) {
+      const apiTokenService = strapi.admin.services['api-token'];
+      const apiToken = await apiTokenService.getBy({
+        accessKey: apiTokenService.hash(token),
+      });
+
+      if (apiToken) {
+        await next();
+        return;
+      }
+    }
+
     // @ts-ignore
     if (strapi?.firebase !== undefined) {
       // @ts-ignore
@@ -70,9 +82,13 @@ export default (config: any, { strapi }: { strapi: Core.Strapi }) => {
         select: ['id'],
       });
     } else {
-      const payload = await strapi?.plugins?.['users-permissions']?.services?.jwt?.verify(token);
-
-      user = { id: payload?.id };
+      try {
+        const payload = await strapi?.plugins?.['users-permissions']?.services?.jwt?.verify(token);
+        user = { id: payload?.id };
+      } catch {
+        strapi.log.info('Unauthorized access attempt (invalid JWT).');
+        return ctx.forbidden('Unauthorized access attempt.');
+      }
     }
 
     if (!user?.id) {
