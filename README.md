@@ -9,7 +9,7 @@ A powerful Strapi plugin that helps protect your data by ensuring users can only
 - 🔄 Automatic user association with new records
 - 📝 Configurable protected routes through the admin panel
 - 🔍 Automatic filtering of collection queries to show only owned data
-- 🔐 Support for both JWT and Firebase authentication
+- 🔐 Support for JWT, Firebase, and Strapi admin API token authentication
 
 ## Installation
 
@@ -50,7 +50,7 @@ For the plugin to work properly, your content types must have a `user` relation 
 
 ### 3. Authentication
 
-The plugin supports both JWT and Firebase authentication. Make sure your authentication system is properly configured before using the plugin.
+The plugin supports JWT, Firebase, and **Strapi admin API tokens**. Valid API tokens bypass ownership checks so backend services (e.g. job workers) can write on behalf of the system. Make sure your authentication system is properly configured before using the plugin.
 
 ### 4. Enabling APIs
 
